@@ -7,14 +7,29 @@
         "php": ">=8.1",
         "ext-ctype": "*",
         "ext-iconv": "*",
-        "symfony/console": "6.1.*",
-        "symfony/dotenv": "6.1.*",
+        "doctrine/doctrine-bundle": "^2.7",
+        "doctrine/doctrine-migrations-bundle": "^3.2",
+        "doctrine/orm": "^2.14",
+        "symfony/amqp-messenger": "6.2.*",
+        "symfony/console": "6.2.*",
+        "symfony/dotenv": "6.2.*",
         "symfony/flex": "^2",
-        "symfony/framework-bundle": "6.1.*",
-        "symfony/runtime": "6.1.*",
-        "symfony/yaml": "6.1.*"
+        "symfony/framework-bundle": "6.2.*",
+        "symfony/messenger": "6.2.*",
+        "symfony/monolog-bundle": "^3.8",
+        "symfony/runtime": "6.2.*",
+        "symfony/security-bundle": "6.2.*",
+        "symfony/uid": "6.2.*",
+        "symfony/yaml": "6.2.*"
     },
     "require-dev": {
+        "codeception/module-asserts": "^3.0",
+        "codeception/module-doctrine2": "^3.0",
+        "codeception/module-phpbrowser": "^3.0",
+        "codeception/module-rest": "^3.3",
+        "codeception/module-symfony": "^3.1",
+        "doctrine/data-fixtures": "^1.6",
+        "vimeo/psalm": "^5.4"
     },
     "config": {
         "allow-plugins": {
@@ -48,6 +63,9 @@
         "symfony/polyfill-php81": "*"
     },
     "scripts": {
+        "psalm": "./vendor/bin/psalm --no-cache --show-info=true",
+        "test": "./vendor/bin/codecept run -v",
+        "cover": "XDEBUG_MODE=coverage ./vendor/bin/codecept run --coverage-text",
         "auto-scripts": {
             "cache:clear": "symfony-cmd",
             "assets:install %PUBLIC_DIR%": "symfony-cmd"
@@ -65,7 +83,7 @@
     "extra": {
         "symfony": {
             "allow-contrib": false,
-            "require": "6.1.*"
+            "require": "6.2.*"
         }
     }
 }

@@ -1,0 +1,16 @@
+### Create book
+POST http://{{frontend_host}}/v1/books
+Content-Type: application/json
+X-Api-Key: {{api_key}}
+
+{
+  "title": "The Some Name Agency33",
+  "author": "John Baddiel",
+  "pages": "50",
+  "releaseDate": "1924-09-03"
+}
+
+### GET
+GET http://{{frontend_host}}/v1/books
+Content-Type: application/json
+X-Api-Key: {{api_key}}

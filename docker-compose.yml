@@ -1,0 +1,46 @@
+version: '3.4'
+
+services:
+  php:
+    image: rabbit_books_php_dev
+    build:
+      context: ./docker/unit
+      target: dev
+    environment:
+      - XDEBUG_MODE=develop,debug,coverage
+      - PHP_DATE_TIMEZONE=${PHP_DATE_TIMEZONE:-UTC}
+      - DATABASE_URL=mysql://user:pass@database:3306/rabbit_books?charset=utf8mb4&serverVersion=8
+      - ASYNC_MESSENGER_TRANSPORT_DSN=amqp://guest:guest@amqp:5672/%2f
+      - API_KEY=fef66ca0-a39f-4edb-a48f-1b0a792fb24e
+    ports:
+      - "80:80"
+    volumes:
+      - .:/var/www:rw
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  database:
+    image: rabbit_books_database
+    build:
+      context: ./docker/mysql
+      args:
+          MYSQL_DOCKER_IMAGE_TAG: percona:8.0.28-19
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: 1
+    volumes:
+      - db-data:/var/lib/mysql:rw
+      - ./docker/mysql/init.dev.sql:/docker-entrypoint-initdb.d/init.sql
+    cap_add:
+        # https://docs.docker.com/engine/security/seccomp/
+        # https://docs.docker.com/config/containers/resource_constraints/
+        - SYS_NICE  # CAP_SYS_NICE
+    ports:
+      - 3306:3306
+
+  amqp:
+    image: rabbitmq:3.9.11-management-alpine
+    ports:
+        - "15672:15672"
+
+volumes:
+  db-data:

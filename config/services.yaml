@@ -4,6 +4,7 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
+    app.api_key: "%env(resolve:API_KEY)%"
 
 services:
     # default configuration for services in *this* file
@@ -15,10 +16,35 @@ services:
     # this creates a service per class whose id is the fully-qualified class name
     App\:
         resource: '../src/'
-        exclude:
-            - '../src/DependencyInjection/'
-            - '../src/Entity/'
-            - '../src/Kernel.php'
 
-    # add more service definitions when explicit configuration is needed
-    # please note that last definitions always *replace* previous ones
+    app.frontend.controllers:
+        namespace: 'App\Frontend\Controller\'
+        resource: '../src/Frontend/Controller'
+        tags: [ 'controller.service_arguments' ]
+
+    app.backend.controllers:
+        namespace: 'App\Backend\Infrastructure\Controller\'
+        resource: '../src/Backend/Infrastructure/Controller'
+        tags: [ 'controller.service_arguments' ]
+
+    App\Frontend\ArgumentValueResolver\CreateBookArgumentResolver:
+        tags:
+            - { name: controller.argument_value_resolver, priority: 150 }
+
+    app.backend.command_handlers:
+        namespace: 'App\Backend\Application\Command\'
+        resource: '../src/Backend/Application/Command/*/*Handler.php'
+        tags: [ { name: messenger.message_handler, bus: command.bus } ]
+
+    app.common.symfony.http_kernel.exception_listener:
+        class: App\Common\Symfony\HttpKernel\ExceptionListener
+        tags:
+            - { name: kernel.event_listener, event: kernel.exception }
+        arguments:
+            - '@logger'
+
+    App\Frontend\Security\ApiKeyUserProvider:
+        class: App\Frontend\Security\ApiKeyUserProvider
+        arguments:
+            $apiKeys:
+                - "%app.api_key%"

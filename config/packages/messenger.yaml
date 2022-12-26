@@ -1,0 +1,42 @@
+framework:
+    messenger:
+        default_bus: command.bus
+        buses:
+            command.bus:
+                middleware:
+                    # each time a message is handled, the Doctrine connection
+                    # is "pinged" and reconnected if it's closed. Useful
+                    # if your workers run for a long time and the database
+                    # connection is sometimes lost
+                    - doctrine_ping_connection
+
+                    # wraps all handlers in a single Doctrine transaction
+                    # handlers do not need to call flush() and an error
+                    # in any handler will cause a rollback
+                    - doctrine_transaction
+        # Uncomment this (and the failed transport below) to send failed messages to this transport for later handling.
+        # failure_transport: failed
+        transports:
+            # https://symfony.com/doc/current/messenger.html#transport-configuration
+            async:
+                dsn: '%env(ASYNC_MESSENGER_TRANSPORT_DSN)%'
+                options:
+                    exchange:
+                        name: books.messages
+                        type: topic
+                    queues:
+                        books.messages.queue:
+                            binding_keys: ["#"]
+            # failed: 'doctrine://default?queue_name=failed'
+            sync: 'sync://'
+
+        routing:
+            # Route your messages to the transports
+            'App\Backend\Application\Command\CreateNewBook\CreateNewBook':
+                - async
+
+when@test:
+   framework:
+       messenger:
+           transports:
+               async: 'sync://'
