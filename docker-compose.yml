@@ -29,7 +29,7 @@ services:
       MYSQL_ALLOW_EMPTY_PASSWORD: 1
     volumes:
       - db-data:/var/lib/mysql:rw
-      - ./docker/mysql/init.dev.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./docker/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
     cap_add:
         # https://docs.docker.com/engine/security/seccomp/
         # https://docs.docker.com/config/containers/resource_constraints/
